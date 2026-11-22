@@ -13,6 +13,5 @@ public record ProductoResponse(
         BigDecimal precio,
         int cuposIniciales,
         String descripcion,
-        String imagen,
         String imagenUrl) {
 }

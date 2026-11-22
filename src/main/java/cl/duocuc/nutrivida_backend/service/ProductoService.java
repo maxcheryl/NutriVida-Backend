@@ -77,7 +77,6 @@ public class ProductoService {
         producto.setPrecio(datos.precio());
         producto.setCuposIniciales(datos.cuposIniciales());
         producto.setDescripcion(datos.descripcion());
-        producto.setImagen(datos.imagen());
         producto.setImagenUrl(datos.imagenUrl());
         producto.setActivo(true);
         return respuesta(productoRepository.save(producto));
@@ -107,7 +106,6 @@ public class ProductoService {
         producto.setPrecio(datos.precio());
         producto.setCuposIniciales(datos.cuposIniciales());
         producto.setDescripcion(datos.descripcion());
-        producto.setImagen(datos.imagen());
         producto.setImagenUrl(datos.imagenUrl());
         return respuesta(productoRepository.save(producto));
     }
@@ -176,7 +174,6 @@ public class ProductoService {
                 producto.getPrecio(),
                 producto.getCuposIniciales(),
                 producto.getDescripcion(),
-                producto.getImagen(),
                 producto.getImagenUrl());
     }
 }

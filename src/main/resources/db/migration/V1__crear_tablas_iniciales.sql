@@ -46,7 +46,6 @@ CREATE TABLE productos (
     precio           DECIMAL(12, 2) NOT NULL,
     cupos_iniciales  INT            NOT NULL,
     descripcion      VARCHAR(1000)  NULL,
-    imagen           VARCHAR(255)   NULL,
     imagen_url       VARCHAR(500)   NULL,
     activo           TINYINT(1)     NOT NULL DEFAULT 1,
     PRIMARY KEY (id),

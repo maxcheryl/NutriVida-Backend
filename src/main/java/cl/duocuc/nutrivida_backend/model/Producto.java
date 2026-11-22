@@ -58,10 +58,6 @@ public class Producto {
     @Column(length = 1000)
     private String descripcion;
 
-    /** Imagen local por defecto del proyecto original. */
-    @Column(length = 255)
-    private String imagen;
-
     /** URL externa de la imagen (Fase 11 / V1 esquema). */
     @Column(name = "imagen_url", length = 500)
     private String imagenUrl;

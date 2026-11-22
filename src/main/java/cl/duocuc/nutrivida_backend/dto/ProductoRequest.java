@@ -40,9 +40,6 @@ public record ProductoRequest(
         @Size(max = 1000, message = "La descripción no puede superar 1000 caracteres.")
         String descripcion,
 
-        @Size(max = 255)
-        String imagen,
-
         @Size(max = 500, message = "La URL de la imagen no puede superar 500 caracteres.")
         String imagenUrl) {
 }
