@@ -20,7 +20,6 @@ CREATE TABLE usuarios (
     genero            VARCHAR(20)   NULL,
     region            VARCHAR(50)   NULL,
     direccion         VARCHAR(150)  NULL,
-    avatar            VARCHAR(255)  NULL,
     rol_id            BIGINT        NOT NULL,
     activo            TINYINT(1)    NOT NULL DEFAULT 1,
     intentos_fallidos INT           NOT NULL DEFAULT 0,

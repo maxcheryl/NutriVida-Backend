@@ -14,7 +14,6 @@ public record UsuarioResponse(
         String region,
         String direccion,
         String rol,
-        String avatar,
         boolean activo) {
 
     /** Proyecta la entidad a la forma pública que consume el frontend. */
@@ -29,7 +28,6 @@ public record UsuarioResponse(
                 usuario.getRegion(),
                 usuario.getDireccion(),
                 usuario.getRol().getNombre(),
-                usuario.getAvatar(),
                 usuario.isActivo());
     }
 }

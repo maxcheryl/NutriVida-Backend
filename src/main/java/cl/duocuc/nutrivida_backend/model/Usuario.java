@@ -55,9 +55,6 @@ public class Usuario {
     @Column(length = 150)
     private String direccion;
 
-    @Column(length = 255)
-    private String avatar;
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "rol_id", nullable = false)
     private Rol rol;
