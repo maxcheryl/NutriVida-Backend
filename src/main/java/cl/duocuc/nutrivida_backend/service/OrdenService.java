@@ -110,8 +110,9 @@ public class OrdenService {
     public OrdenResponse obtener(Usuario usuario, Long id) {
         Orden orden = ordenRepository.buscarConDetalles(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Orden no encontrada"));
-        boolean esAdmin = "administrador".equals(usuario.getRol().getNombre());
-        if (!esAdmin && !orden.getUsuario().getId().equals(usuario.getId())) {
+        boolean esStaff = "administrador".equalsIgnoreCase(usuario.getRol().getNombre())
+                || "recepcionista".equalsIgnoreCase(usuario.getRol().getNombre());
+        if (!esStaff && !orden.getUsuario().getId().equals(usuario.getId())) {
             throw new OperacionNoPermitidaException("No tienes permiso para ver esta orden");
         }
         return respuesta(orden);

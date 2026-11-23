@@ -79,6 +79,4 @@ CREATE TABLE detalles_orden (
     CONSTRAINT chk_detalles_precio CHECK (precio_unitario >= 1000)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
--- Índices adicionales (los de las FK los crea InnoDB automáticamente;
--- los UNIQUE ya generan índice implícito en correo, código y nombre)
 CREATE INDEX idx_ordenes_fecha ON ordenes (fecha);

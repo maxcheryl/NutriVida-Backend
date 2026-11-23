@@ -55,8 +55,8 @@ public class SecurityConfig {
                         // Mantenimiento: todo lo demás de usuarios/categorías/productos es admin
                         .requestMatchers("/api/v1/usuarios/**", "/api/v1/categorias/**", "/api/v1/productos/**")
                                 .hasRole("ADMINISTRADOR")
-                        // Órdenes: listado general y cancelación son admin
-                        .requestMatchers(HttpMethod.GET, "/api/v1/ordenes").hasRole("ADMINISTRADOR")
+                        // Órdenes: listado general (admin o recepcionista) y cancelación (solo admin)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/ordenes").hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/ordenes/*/cancelar").hasRole("ADMINISTRADOR")
                         // Todo lo demás requiere sesión (crear órdenes, mías, perfil, me)
                         .anyRequest().authenticated())

@@ -46,7 +46,7 @@ public class OrdenController {
         return ResponseEntity.ok(ordenService.listarDelUsuario(usuario));
     }
 
-    @Operation(summary = "Listar todas las órdenes", description = "Solo administrador.")
+    @Operation(summary = "Listar todas las órdenes", description = "Administrador o recepcionista.")
     @GetMapping
     public ResponseEntity<List<OrdenResponse>> listar() {
         return ResponseEntity.ok(ordenService.listarTodas());
