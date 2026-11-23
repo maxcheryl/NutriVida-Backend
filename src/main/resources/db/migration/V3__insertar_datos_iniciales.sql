@@ -8,14 +8,14 @@
 -- Contraseña de todos: política de 8+ con mayúscula, minúscula y dígito.
 INSERT INTO usuarios (nombre, apellido, correo, fecha_nacimiento, contrasena, genero, region, direccion, rol_id, activo, intentos_fallidos)
 VALUES
-    ('Ana', 'Administradora', 'admin@duocuc.cl', '1990-05-10',
-     '$2a$10$NaN9GYKvowKpem6.9vmbce8v4XszmUs2mKjnmll7oN8hWvfxdlBua',
-     'NoDice', 'Región Metropolitana', 'Oficina central', 1, 1, 0),
-    ('Rosa', 'Recepcionista', 'recepcion@duocuc.cl', '1995-08-22',
-     '$2a$10$8oXtn9TlsQ/p.gZjzkt62.nnCI9OX/cXYUs/P8rVl1MR5fNE3Y9Fy',
-     'Mujer', 'Región de La Araucanía', 'Recepción', 2, 1, 0),
-    ('Carlos', 'Cliente', 'cliente@duocuc.cl', '2000-03-15',
-     '$2a$10$CZfkMZcwPmQxzjHmkSHKl.1hf8khvaclw0YqeyUS8N0JVAosW.x5a',
+    ('Dali', 'Administrador', 'admin@duocuc.cl', '2004-01-11',
+     '$2a$10$jl5XeLsy1eVnFO9ycwmuJ.T10o32r9VsKJiGjKHJ1KmPfEzMej1ua',
+     'Hombre', 'Región Metropolitana', 'Oficina central', 1, 1, 0),
+    ('Obiwan', 'Recepcionista', 'recepcion@duocuc.cl', '1995-08-22',
+     '$2a$10$MG9yeshJEhdIVaJzZ5a0me7RqYAYvTdx559SqYv3u56XJybsujBN2',
+     'Hombre', 'Región de La Araucanía', 'Recepción', 2, 1, 0),
+    ('Arthur', 'Cliente', 'cliente@duocuc.cl', '2000-03-15',
+     '$2a$10$zwQ9eCY9JLfgycJEdELEfuJAAWGVxhKMu8opoc9mzg6KYx45VP28.',
      'Hombre', 'Región de La Araucanía', 'Av. Alemania 123', 3, 1, 0);
 
 -- ---------- Categorías ----------
@@ -26,7 +26,7 @@ INSERT INTO categorias (nombre) VALUES
     ('Taller grupal');
 
 -- ---------- Productos (18 servicios) ----------
-INSERT INTO productos (codigo, nombre, categoria_id, duracion, modalidad, precio, cupos_iniciales, descripcion, imagen_url, activo) VALUES
+INSERT INTO productos (codigo, nombre, categoria_id, duracion, modalidad, precio, cupos, descripcion, imagen_url, activo) VALUES
     ('CN001', 'Primera consulta nutricional',
      (SELECT id FROM categorias WHERE nombre = 'Consulta'),
      '50 min', 'Presencial', 35000, 5,

@@ -52,7 +52,7 @@ public class Producto {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal precio;
 
-    @Column(name = "cupos_iniciales", nullable = false)
+    @Column(name = "cupos", nullable = false)
     private int cuposIniciales;
 
     @Column(length = 1000)

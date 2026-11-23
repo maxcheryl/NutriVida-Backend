@@ -43,7 +43,7 @@ CREATE TABLE productos (
     duracion         VARCHAR(20)    NULL,
     modalidad        VARCHAR(40)    NULL,
     precio           DECIMAL(12, 2) NOT NULL,
-    cupos_iniciales  INT            NOT NULL,
+    cupos  INT            NOT NULL,
     descripcion      VARCHAR(1000)  NULL,
     imagen_url       VARCHAR(500)   NULL,
     activo           TINYINT(1)     NOT NULL DEFAULT 1,
@@ -51,7 +51,7 @@ CREATE TABLE productos (
     UNIQUE KEY uq_productos_codigo (codigo),
     CONSTRAINT fk_productos_categoria FOREIGN KEY (categoria_id) REFERENCES categorias (id),
     CONSTRAINT chk_productos_precio CHECK (precio >= 1000),
-    CONSTRAINT chk_productos_cupos CHECK (cupos_iniciales >= 0)
+    CONSTRAINT chk_productos_cupos CHECK (cupos >= 0)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE ordenes (
