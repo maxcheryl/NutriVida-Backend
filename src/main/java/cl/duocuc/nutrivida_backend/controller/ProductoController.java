@@ -3,8 +3,13 @@ package cl.duocuc.nutrivida_backend.controller;
 import cl.duocuc.nutrivida_backend.dto.ProductoRequest;
 import cl.duocuc.nutrivida_backend.dto.ProductoResponse;
 import cl.duocuc.nutrivida_backend.dto.StockRequest;
+import cl.duocuc.nutrivida_backend.dto.ErrorResponse;
 import cl.duocuc.nutrivida_backend.service.ProductoService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -26,11 +31,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/productos")
 @RequiredArgsConstructor
 @Tag(name = "Productos", description = "Catálogo de servicios/planes y stock de cupos")
+@ApiResponses({
+        @ApiResponse(responseCode = "400", description = "Solicitud inválida.",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "401", description = "Se requiere autenticación para mantenimiento.",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "403", description = "Rol sin permisos para mantenimiento.",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Producto no encontrado.",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "409", description = "Conflicto al crear o actualizar el producto.",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor.",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+})
 public class ProductoController {
 
     private final ProductoService productoService;
 
     @Operation(summary = "Catálogo de productos", description = "Solo productos activos; filtro opcional por categoría.")
+    @ApiResponse(responseCode = "200", description = "Listado de productos.")
     @GetMapping
     public ResponseEntity<List<ProductoResponse>> listar(
             @RequestParam(required = false) String categoria) {
@@ -38,6 +58,7 @@ public class ProductoController {
     }
 
     @Operation(summary = "Obtener producto por id o código", description = "Acepta el ID numérico o el código alfanumérico (ej. CN001).")
+    @ApiResponse(responseCode = "200", description = "Producto encontrado.")
     @GetMapping("/{identificador}")
     public ResponseEntity<ProductoResponse> obtener(@PathVariable String identificador) {
         if (identificador.matches("\\d+")) {
@@ -47,12 +68,14 @@ public class ProductoController {
     }
 
     @Operation(summary = "Crear producto")
+    @ApiResponse(responseCode = "201", description = "Producto creado.")
     @PostMapping
     public ResponseEntity<ProductoResponse> crear(@Valid @RequestBody ProductoRequest datos) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productoService.crear(datos));
     }
 
     @Operation(summary = "Editar producto", description = "Acepta el ID numérico o el código del producto.")
+    @ApiResponse(responseCode = "200", description = "Producto actualizado.")
     @PutMapping("/{identificador}")
     public ResponseEntity<ProductoResponse> editar(
             @PathVariable String identificador,
@@ -62,6 +85,7 @@ public class ProductoController {
 
     @Operation(summary = "Actualizar cupos libres",
             description = "Administrador o recepcionista. Acepta ID o código. El valor es el cupo disponible actual (0 a 1000).")
+    @ApiResponse(responseCode = "200", description = "Cupos actualizados.")
     @PutMapping("/{identificador}/stock")
     public ResponseEntity<ProductoResponse> actualizarStock(
             @PathVariable String identificador,
@@ -70,6 +94,7 @@ public class ProductoController {
     }
 
     @Operation(summary = "Desactivar producto", description = "Baja lógica: sale del catálogo, conserva historial.")
+    @ApiResponse(responseCode = "200", description = "Producto desactivado.")
     @DeleteMapping("/{identificador}")
     public ResponseEntity<ProductoResponse> eliminar(@PathVariable String identificador) {
         return ResponseEntity.ok(productoService.eliminar(identificador));

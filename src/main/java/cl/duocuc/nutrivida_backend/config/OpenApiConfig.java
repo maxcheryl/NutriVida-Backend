@@ -16,8 +16,9 @@ public class OpenApiConfig {
                 .title("Clínica NutriVida API")
                 .description("""
                         API REST del ecommerce de la Clínica NutriVida.
-                        Autenticación mediante JWT almacenado en cookie httpOnly:
-                        el access token vence a los 30 minutos y el refresh token a los 7 días.""")
+                        Autenticación mediante cookies JWT HttpOnly: `nutrivida_token` (access, 30 min)
+                        y `nutrivida_refresh` (refresh, 7 días). Los errores de la API se responden
+                        en JSON con `mensaje` y, cuando aplica, `campos`.""")
                 .version("1.0")
                 .license(new License().name("DuocUC - DSY1104")));
     }
