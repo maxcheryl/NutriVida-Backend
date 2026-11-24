@@ -38,7 +38,7 @@ public class AuthService {
     private final JwtService jwtService;
 
     /** Login: valida credenciales, maneja intentos fallidos y emite cookies. */
-    @Transactional
+    @Transactional(noRollbackFor = CredencialesInvalidasException.class)
     public UsuarioResponse login(LoginRequest datos, HttpServletResponse respuesta) {
         String correo = datos.correo().trim().toLowerCase();
         Usuario usuario = usuarioRepository.findByCorreo(correo)
