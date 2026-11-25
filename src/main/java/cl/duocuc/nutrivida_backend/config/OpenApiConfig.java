@@ -6,7 +6,7 @@ import io.swagger.v3.oas.models.info.License;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** Documentación Swagger/OpenAPI del API. */
+/** Define la información general que aparece en Swagger. */
 @Configuration
 public class OpenApiConfig {
 

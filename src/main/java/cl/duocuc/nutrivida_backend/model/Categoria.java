@@ -14,10 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Categoría del catálogo (Consulta, Plan especializado, Evaluación, Taller grupal).
- * Los productos la referencian por id (3FN: no se duplica el nombre).
- */
+/** Agrupa los servicios del catálogo, como consultas o evaluaciones. */
 @Entity
 @Table(name = "categorias")
 @Getter

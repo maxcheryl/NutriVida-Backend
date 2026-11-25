@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Categorías del catálogo: lectura pública y mantenimiento administrativo. */
+/** Expone las operaciones para consultar y administrar categorías. */
 @RestController
 @RequestMapping("/api/v1/categorias")
 @RequiredArgsConstructor

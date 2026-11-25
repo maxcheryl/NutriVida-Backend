@@ -25,10 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Gestión de usuarios. La baja/reactivación es lógica para conservar el
- * historial de órdenes. Alta permitida a administrador y recepcionista.
- */
+/** Expone las operaciones para consultar y administrar cuentas de usuario. */
 @RestController
 @RequestMapping("/api/v1/usuarios")
 @RequiredArgsConstructor

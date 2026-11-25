@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Catálogo de productos: lectura pública y mantenimiento administrativo. */
+/** Expone las operaciones del catálogo de servicios y sus cupos. */
 @RestController
 @RequestMapping("/api/v1/productos")
 @RequiredArgsConstructor

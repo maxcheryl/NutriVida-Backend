@@ -1,9 +1,6 @@
 package cl.duocuc.nutrivida_backend.model;
 
-/**
- * Estados posibles de una orden (compra/reserva).
- * Nace RESERVADA al confirmar el carrito; el administrador puede cancelarla.
- */
+/** Una reserva está activa o ya fue cancelada. */
 public enum EstadoOrden {
     RESERVADA,
     CANCELADA

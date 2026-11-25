@@ -4,10 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Orden (compra/reserva): identificador, fecha, estado, total,
- * cliente (en el listado administrativo) y detalle de productos.
- */
+/** Datos de una reserva que la API devuelve al frontend. */
 public record OrdenResponse(
         Long id,
         LocalDateTime fecha,

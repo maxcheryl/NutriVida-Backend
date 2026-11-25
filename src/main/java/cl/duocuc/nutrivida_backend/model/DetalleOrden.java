@@ -15,10 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Línea de una orden. `precioUnitario` es el precio histórico al momento
- * de la compra: no cambia si el producto varía de precio después.
- */
+/** Guarda un servicio reservado y el precio que tenía al hacer la reserva. */
 @Entity
 @Table(name = "detalles_orden")
 @Getter

@@ -16,25 +16,25 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     boolean existsByCodigo(String codigo);
 
-    /** Catálogo: solo productos activos. */
+    /** Devuelve los servicios que siguen visibles en el catálogo. */
     List<Producto> findByActivoTrue();
 
-    /** Productos de una categoría (para validaciones de borrado). */
+    /** Cuenta los servicios de una categoría antes de eliminarla. */
     long countByCategoriaId(Long categoriaId);
 
     @Query("SELECT p FROM Producto p WHERE p.activo = true AND p.categoria.nombre = :categoria")
     List<Producto> buscarPorCategoria(@Param("categoria") String categoria);
 
     /**
-     * Descuento atómico de cupos: solo aplica si quedan suficientes.
-     * Devuelve 0 filas afectadas cuando no hay stock (evita sobreventa).
+     * Descuenta cupos solo si todavía hay suficientes.
+     * Devuelve cero si otra reserva ya ocupó los últimos cupos.
      */
     @Modifying
     @Query("UPDATE Producto p SET p.cuposIniciales = p.cuposIniciales - :cantidad "
             + "WHERE p.id = :id AND p.activo = true AND p.cuposIniciales >= :cantidad")
     int descontarCupos(@Param("id") Long id, @Param("cantidad") int cantidad);
 
-    /** Devolución de cupos al cancelar una orden. */
+    /** Devuelve al catálogo los cupos de una orden cancelada. */
     @Modifying
     @Query("UPDATE Producto p SET p.cuposIniciales = p.cuposIniciales + :cantidad WHERE p.id = :id")
     int devolverCupos(@Param("id") Long id, @Param("cantidad") int cantidad);

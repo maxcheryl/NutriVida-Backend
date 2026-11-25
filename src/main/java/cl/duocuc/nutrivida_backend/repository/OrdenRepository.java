@@ -11,13 +11,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OrdenRepository extends JpaRepository<Orden, Long> {
 
-    /** Historial del cliente, más reciente primero. */
+    /** Busca las reservas de una persona, empezando por la más reciente. */
     List<Orden> findByUsuarioIdOrderByFechaDesc(Long usuarioId);
 
-    /** Listado administrativo general, más reciente primero. */
+    /** Busca todas las reservas, empezando por la más reciente. */
     List<Orden> findAllByOrderByFechaDesc();
 
-    /** Detalle con líneas ya cargadas (evita lazy en la respuesta). */
+    /** Busca una orden y carga sus líneas antes de preparar la respuesta. */
     @Query("SELECT o FROM Orden o LEFT JOIN FETCH o.detalles WHERE o.id = :id")
     Optional<Orden> buscarConDetalles(@Param("id") Long id);
 }

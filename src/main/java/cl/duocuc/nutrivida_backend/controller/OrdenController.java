@@ -25,10 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Órdenes (reservas): el cliente confirma su carrito y consulta su
- * historial; el administrador lista todas y puede cancelar (devuelve cupos).
- */
+/** Expone las operaciones para crear, consultar y cancelar reservas. */
 @RestController
 @RequestMapping("/api/v1/ordenes")
 @RequiredArgsConstructor

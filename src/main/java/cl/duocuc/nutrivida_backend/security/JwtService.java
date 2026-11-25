@@ -23,10 +23,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.stereotype.Service;
 
-/**
- * Generación y validación de JWT (HMAC-SHA256) y manejo de las cookies
- * httpOnly que guardan el access token (30 min) y el refresh token (7 días).
- */
+/** Crea y valida los tokens JWT que mantienen la sesión en cookies seguras. */
 @Service
 public class JwtService {
 
@@ -53,7 +50,7 @@ public class JwtService {
         this.segundosRefresh = diasRefresh * 24 * 60 * 60;
     }
 
-    /** Access token: identifica al usuario en cada petición. */
+    /** Crea el token corto que identifica al usuario en sus solicitudes. */
     public String generarAcceso(Usuario usuario) {
         Instant ahora = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
@@ -66,7 +63,7 @@ public class JwtService {
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
-    /** Refresh token: permite renovar el access token sin volver a pedir la contraseña. */
+    /** Crea el token que permite renovar la sesión sin pedir otra vez la contraseña. */
     public String generarRefresh(Usuario usuario) {
         Instant ahora = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
@@ -78,12 +75,12 @@ public class JwtService {
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
-    /** Decodifica y valida firma/vigencia. Lanza JwtException si no es válido. */
+    /** Comprueba la firma y la fecha de expiración del token. */
     public Jwt decodificar(String token) throws JwtException {
         return jwtDecoder.decode(token);
     }
 
-    /** true si el token es un refresh token válido (firma + vigencia + tipo). */
+    /** Comprueba que el token sea válido y que se haya creado para renovar la sesión. */
     public boolean esRefreshValido(String token) {
         try {
             Jwt jwt = jwtDecoder.decode(token);
@@ -99,23 +96,23 @@ public class JwtService {
 
     // ==================== COOKIES HTTPONLY ====================
 
-    /** Escribe la cookie de acceso (httpOnly) en la respuesta. */
+    /** Guarda el token de acceso en una cookie que JavaScript no puede leer. */
     public void agregarCookieAcceso(HttpServletResponse respuesta, String token) {
         agregarCookie(respuesta, COOKIE_ACCESO, token, (int) segundosAcceso);
     }
 
-    /** Escribe la cookie de refresh (httpOnly) en la respuesta. */
+    /** Guarda el token de renovación en una cookie que JavaScript no puede leer. */
     public void agregarCookieRefresh(HttpServletResponse respuesta, String token) {
         agregarCookie(respuesta, COOKIE_REFRESH, token, (int) segundosRefresh);
     }
 
-    /** Borra ambas cookies (cierre de sesión). */
+    /** Elimina las dos cookies para cerrar la sesión. */
     public void limpiarCookies(HttpServletResponse respuesta) {
         agregarCookie(respuesta, COOKIE_ACCESO, "", 0);
         agregarCookie(respuesta, COOKIE_REFRESH, "", 0);
     }
 
-    /** Lee el valor de una cookie por nombre; null si no existe. */
+    /** Busca una cookie por nombre y devuelve null si no existe. */
     public String leerCookie(HttpServletRequest solicitud, String nombre) {
         if (solicitud.getCookies() == null) return null;
         for (Cookie cookie : solicitud.getCookies()) {
@@ -124,6 +121,7 @@ public class JwtService {
         return null;
     }
 
+    /** Escribe una cookie con las opciones de seguridad compartidas por ambos tokens. */
     private void agregarCookie(HttpServletResponse respuesta, String nombre, String valor, int maxAge) {
         ResponseCookie cookie = ResponseCookie.from(nombre, valor)
                 .httpOnly(true)
@@ -134,7 +132,7 @@ public class JwtService {
         respuesta.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
-    /** Id de usuario desde el subject del access token; -1 si es inválido. */
+    /** Devuelve el id de usuario del token o -1 si no se puede leer. */
     public long idDesdeToken(String token) {
         try {
             return Long.parseLong(decodificar(token).getSubject());

@@ -7,10 +7,7 @@ import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
-/**
- * Edición del perfil del usuario autenticado. El rol no se modifica aquí.
- * Para cambiar la contraseña se envían `contrasenaActual` y `contrasenaNueva`.
- */
+/** Datos para actualizar el perfil y, si se desea, cambiar la contraseña. */
 public record PerfilRequest(
         @NotBlank(message = "El nombre es obligatorio.")
         @Size(max = 50)

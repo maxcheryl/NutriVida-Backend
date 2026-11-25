@@ -19,11 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Autenticación: login con bloqueo a los 3 intentos, registro público de
- * clientes, renovación de sesión por refresh token y cierre de sesión.
- * La sesión viaja en cookies httpOnly (access 30 min / refresh 7 días).
- */
+/** Gestiona el inicio de sesión, el registro y las cookies que mantienen la sesión. */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -37,7 +33,10 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    /** Login: valida credenciales, maneja intentos fallidos y emite cookies. */
+    /**
+     * Comprueba las credenciales y guarda cada intento fallido.
+     * La excepción no debe deshacer el contador que acabamos de guardar.
+     */
     @Transactional(noRollbackFor = CredencialesInvalidasException.class)
     public UsuarioResponse login(LoginRequest datos, HttpServletResponse respuesta) {
         String correo = datos.correo().trim().toLowerCase();
@@ -68,7 +67,7 @@ public class AuthService {
         return UsuarioResponse.desde(usuario);
     }
 
-    /** Registro público: siempre crea un cliente con el dominio @duocuc.cl. */
+    /** Registra una cuenta de cliente y la deja con la sesión iniciada. */
     @Transactional
     public UsuarioResponse registro(RegistroRequest datos, HttpServletResponse respuesta) {
         String correo = datos.correo().trim().toLowerCase();
@@ -101,10 +100,7 @@ public class AuthService {
         return UsuarioResponse.desde(guardado);
     }
 
-    /**
-     * Renovación de sesión: valida la cookie de refresh y emite un nuevo
-     * par de cookies. Limpia las cookies si el refresh token no es válido.
-     */
+    /** Renueva las cookies de sesión o las borra si el token ya no sirve. */
     @Transactional(readOnly = true)
     public UsuarioResponse refresh(HttpServletRequest solicitud, HttpServletResponse respuesta) {
         String token = jwtService.leerCookie(solicitud, JwtService.COOKIE_REFRESH);
@@ -132,19 +128,19 @@ public class AuthService {
         return UsuarioResponse.desde(usuario);
     }
 
-    /** Cierra la sesión borrando ambas cookies. */
+    /** Cierra la sesión eliminando las dos cookies. */
     public void logout(HttpServletResponse respuesta) {
         jwtService.limpiarCookies(respuesta);
     }
 
-    /** Usuario autenticado actual (cookie de acceso ya validada por el filtro). */
+    /** Devuelve los datos públicos de la persona que inició sesión. */
     @Transactional(readOnly = true)
     public UsuarioResponse obtenerActual(Usuario usuario) {
         return UsuarioResponse.desde(usuarioRepository.findById(usuario.getId())
                 .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado")));
     }
 
-    /** Escribe access + refresh cookies httpOnly. */
+    /** Guarda en el navegador los dos tokens de la sesión. */
     private void emitirCookies(HttpServletResponse respuesta, Usuario usuario) {
         jwtService.agregarCookieAcceso(respuesta, jwtService.generarAcceso(usuario));
         jwtService.agregarCookieRefresh(respuesta, jwtService.generarRefresh(usuario));

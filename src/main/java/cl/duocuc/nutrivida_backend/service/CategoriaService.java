@@ -12,10 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Mantenimiento de categorías. A diferencia de usuarios/productos, la
- * eliminación es física y solo se permite si no tiene productos asociados.
- */
+/** Crea, consulta, actualiza y elimina las categorías del catálogo. */
 @Service
 @RequiredArgsConstructor
 public class CategoriaService {
@@ -64,12 +61,13 @@ public class CategoriaService {
                 productoRepository.countByCategoriaId(guardada.getId()));
     }
 
-    /** Borrado físico; falla con 409 si algún producto depende de la categoría. */
+    /** Elimina la categoría solo si no tiene servicios asociados. */
     @Transactional
     public void eliminar(Long id) {
         Categoria categoria = buscar(id);
         long productos = productoRepository.countByCategoriaId(id);
         if (productos > 0) {
+            // Evita dejar productos sin una categoría válida.
             throw new ConflictoException(
                     "No se puede eliminar la categoría: tiene " + productos + " producto(s) asociado(s)");
         }

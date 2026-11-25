@@ -15,12 +15,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-/**
- * Seguridad del API: stateless con JWT en cookies httpOnly, CORS para el
- * dev server de Vite y autorización por método (GET público para catálogo;
- * administrador para mantenimiento; recepcionista o administrador para stock;
- * cliente autenticado para su carrito/historial).
- */
+/** Define qué rutas son públicas y qué roles pueden usar las demás. */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -38,27 +33,27 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(gestiona -> gestiona.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(autoriza -> autoriza
-                        // Documentación y errores
+                        // Swagger y la ruta de error se pueden consultar sin iniciar sesión.
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/error").permitAll()
-                        // Autenticación: registro/login/refresh/logout son públicos
+                        // Estas rutas permiten iniciar, renovar y cerrar la sesión.
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/auth/login", "/api/v1/auth/registro",
                                 "/api/v1/auth/refresh", "/api/v1/auth/logout").permitAll()
-                        // Catálogo público
+                        // Cualquier visitante puede consultar el catálogo.
                         .requestMatchers(HttpMethod.GET, "/api/v1/productos/**", "/api/v1/categorias/**").permitAll()
-                        // Gestión de usuarios: crear/activar/desactivar (recepción o admin)
+                        // Administración y recepción pueden crear usuarios.
                         .requestMatchers(HttpMethod.POST, "/api/v1/usuarios/**")
                                 .hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA")
-                        // Actualización de stock del catálogo (recepción o admin)
+                        // Administración y recepción pueden cambiar los cupos disponibles.
                         .requestMatchers(HttpMethod.PUT, "/api/v1/productos/*/stock")
                                 .hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA")
-                        // Mantenimiento: todo lo demás de usuarios/categorías/productos es admin
+                        // El resto de los cambios en usuarios, categorías y productos es solo para administración.
                         .requestMatchers("/api/v1/usuarios/**", "/api/v1/categorias/**", "/api/v1/productos/**")
                                 .hasRole("ADMINISTRADOR")
-                        // Órdenes: listado general (admin o recepcionista) y cancelación (solo admin)
+                        // Recepción puede ver todas las órdenes; solo administración puede cancelarlas.
                         .requestMatchers(HttpMethod.GET, "/api/v1/ordenes").hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/ordenes/*/cancelar").hasRole("ADMINISTRADOR")
-                        // Todo lo demás requiere sesión (crear órdenes, mías, perfil, me)
+                        // Cualquier ruta no indicada arriba requiere una sesión válida.
                         .anyRequest().authenticated())
                 .exceptionHandling(excepciones -> excepciones
                         .authenticationEntryPoint(JsonSecurityHandlers.puntoEntrada())
@@ -68,7 +63,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /** Solo el dev server de Vite (localhost:5173) puede llamar al API con credenciales. */
+    /** Permite al frontend local llamar a la API y enviar las cookies de sesión. */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuracion = new CorsConfiguration();

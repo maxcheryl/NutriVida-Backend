@@ -22,11 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Órdenes (reservas): al confirmar el carrito se descuentan cupos de forma
- * atómica y la orden nace RESERVADA; el administrador puede cancelarla y
- * los cupos se devuelven. El cliente solo ve su propio historial.
- */
+/** Crea y consulta reservas, y devuelve los cupos cuando se cancela una orden. */
 @Service
 @RequiredArgsConstructor
 public class OrdenService {
@@ -34,18 +30,16 @@ public class OrdenService {
     private final OrdenRepository ordenRepository;
     private final ProductoRepository productoRepository;
 
-    /**
-     * Confirmación del carrito: valida stock de todos los ítems, descuenta
-     * cupos y crea la orden RESERVADA con precios históricos.
-     */
+    /** Comprueba los cupos y guarda la reserva con los precios del momento. */
     @Transactional
     public OrdenResponse crear(Usuario usuario, OrdenCreateRequest datos) {
         Map<String, Integer> cantidades = new LinkedHashMap<>();
         for (var item : datos.items()) {
+            // Si el mismo servicio aparece más de una vez, suma sus cantidades.
             cantidades.merge(item.codigo().trim().toUpperCase(), item.cantidad(), Integer::sum);
         }
 
-        // 1) Validar productos y descontar cupos de forma atómica (todo o nada)
+        // Primero descuenta todos los cupos. Si uno falla, la transacción revierte los anteriores.
         Map<Producto, Integer> aReservar = new LinkedHashMap<>();
         for (var entrada : cantidades.entrySet()) {
             Producto producto = productoRepository.findByCodigo(entrada.getKey())
@@ -54,7 +48,6 @@ public class OrdenService {
                             "Producto no encontrado: " + entrada.getKey()));
 
             if (productoRepository.descontarCupos(producto.getId(), entrada.getValue()) == 0) {
-                // La excepción revierte también los descuentos anteriores
                 throw new StockInsuficienteException(
                         "No hay cupos suficientes para \"" + producto.getNombre()
                                 + "\". Ajusta tu reserva para continuar");
@@ -62,7 +55,7 @@ public class OrdenService {
             aReservar.put(producto, entrada.getValue());
         }
 
-        // 2) Construir la orden con precio histórico
+        // Guarda el precio actual en el detalle para conservarlo aunque luego cambie el catálogo.
         Orden orden = new Orden();
         orden.setUsuario(usuario);
         orden.setFecha(LocalDateTime.now());
@@ -89,7 +82,7 @@ public class OrdenService {
         return respuesta(ordenRepository.buscarConDetalles(guardada.getId()).orElse(guardada));
     }
 
-    /** Historial del cliente autenticado, más reciente primero. */
+    /** Devuelve las reservas de este cliente, empezando por la más reciente. */
     @Transactional(readOnly = true)
     public List<OrdenResponse> listarDelUsuario(Usuario usuario) {
         return ordenRepository.findByUsuarioIdOrderByFechaDesc(usuario.getId()).stream()
@@ -97,7 +90,7 @@ public class OrdenService {
                 .toList();
     }
 
-    /** Listado general (solo administrador). */
+    /** Devuelve todas las reservas, empezando por la más reciente. */
     @Transactional(readOnly = true)
     public List<OrdenResponse> listarTodas() {
         return ordenRepository.findAllByOrderByFechaDesc().stream()
@@ -105,7 +98,7 @@ public class OrdenService {
                 .toList();
     }
 
-    /** Detalle de una orden: el cliente solo puede ver las suyas. */
+    /** Comprueba que el cliente solo pueda consultar sus propias reservas. */
     @Transactional(readOnly = true)
     public OrdenResponse obtener(Usuario usuario, Long id) {
         Orden orden = ordenRepository.buscarConDetalles(id)
@@ -118,10 +111,7 @@ public class OrdenService {
         return respuesta(orden);
     }
 
-    /**
-     * Cancelación administrativa: devuelve los cupos y marca la orden
-     * como CANCELADA. Solo las órdenes RESERVADA se pueden cancelar.
-     */
+    /** Cancela una reserva activa y devuelve al catálogo los cupos que ocupaba. */
     @Transactional
     public OrdenResponse cancelar(Long id) {
         Orden orden = ordenRepository.buscarConDetalles(id)
@@ -138,7 +128,7 @@ public class OrdenService {
         return respuesta(ordenRepository.save(orden));
     }
 
-    /** Proyecta la orden con sus líneas (subtotal por línea). */
+    /** Prepara los datos de la reserva y sus líneas para la respuesta de la API. */
     public static OrdenResponse respuesta(Orden orden) {
         List<DetalleOrdenResponse> detalles = orden.getDetalles().stream()
                 .map(d -> new DetalleOrdenResponse(

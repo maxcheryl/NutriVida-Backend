@@ -2,7 +2,7 @@ package cl.duocuc.nutrivida_backend.dto;
 
 import java.math.BigDecimal;
 
-/** Producto del catálogo tal como lo consume el frontend (`tipo` = nombre de categoría). */
+/** Datos de un servicio que el backend envía al frontend. */
 public record ProductoResponse(
         Long id,
         String codigo,

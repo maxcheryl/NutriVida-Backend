@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Autenticación: login, registro público, refresh y cierre de sesión. */
+/** Expone las rutas para registrarse, iniciar sesión y mantener la sesión. */
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor

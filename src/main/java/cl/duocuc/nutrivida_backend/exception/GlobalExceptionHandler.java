@@ -13,10 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/**
- * Manejo centralizado de excepciones: todas las respuestas de error
- * siguen el mismo formato JSON con el mensaje y, si aplica, los campos.
- */
+/** Convierte los errores de la aplicación en respuestas JSON uniformes. */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -57,6 +54,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> validacion(MethodArgumentNotValidException e) {
+        // Conserva cada error junto al nombre del campo para que el frontend lo pueda mostrar.
         Map<String, String> campos = new HashMap<>();
         for (FieldError error : e.getBindingResult().getFieldErrors()) {
             campos.put(error.getField(), error.getDefaultMessage());

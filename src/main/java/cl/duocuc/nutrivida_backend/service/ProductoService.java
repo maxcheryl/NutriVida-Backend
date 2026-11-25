@@ -1,6 +1,5 @@
 package cl.duocuc.nutrivida_backend.service;
 
-import cl.duocuc.nutrivida_backend.dto.CategoriaRequest;
 import cl.duocuc.nutrivida_backend.dto.ProductoRequest;
 import cl.duocuc.nutrivida_backend.dto.ProductoResponse;
 import cl.duocuc.nutrivida_backend.dto.StockRequest;
@@ -17,11 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Catálogo de productos: lectura pública (solo activos) y mantenimiento
- * administrativo (alta, edición, baja lógica) más la actualización de
- * cupos libres que también puede hacer la recepción.
- */
+/** Administra el catálogo y los cupos disponibles para cada servicio. */
 @Service
 @RequiredArgsConstructor
 public class ProductoService {
@@ -29,7 +24,7 @@ public class ProductoService {
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
 
-    /** Catálogo público; opcionalmente filtrado por nombre de categoría. */
+    /** Devuelve los servicios activos y, si se indica, filtra por categoría. */
     @Transactional(readOnly = true)
     public List<ProductoResponse> listar(String categoria) {
         List<Producto> productos = productoRepository.findByActivoTrue();
@@ -58,7 +53,7 @@ public class ProductoService {
         return respuesta(producto);
     }
 
-    /** Alta de producto en el panel administrativo. */
+    /** Añade un servicio nuevo al catálogo. */
     @Transactional
     public ProductoResponse crear(ProductoRequest datos) {
         String codigo = datos.codigo().trim().toUpperCase();
@@ -82,7 +77,7 @@ public class ProductoService {
         return respuesta(productoRepository.save(producto));
     }
 
-    /** Edición de producto desde el panel administrativo. */
+    /** Actualiza los datos de un servicio existente. */
     @Transactional
     public ProductoResponse editar(Long id, ProductoRequest datos) {
         return editar(String.valueOf(id), datos);
@@ -110,7 +105,7 @@ public class ProductoService {
         return respuesta(productoRepository.save(producto));
     }
 
-    /** Baja lógica: el producto sale del catálogo pero el historial se conserva. */
+    /** Oculta el servicio del catálogo sin borrar el historial de reservas. */
     @Transactional
     public ProductoResponse eliminar(Long id) {
         return eliminar(String.valueOf(id));
@@ -123,10 +118,7 @@ public class ProductoService {
         return respuesta(productoRepository.save(producto));
     }
 
-    /**
-     * Actualiza los cupos LIBRES (admin o recepción). El valor ingresado es
-     * directamente el disponible actual, igual que en el panel original.
-     */
+    /** Reemplaza la cantidad de cupos que quedan disponibles para reservar. */
     @Transactional
     public ProductoResponse actualizarStock(Long id, StockRequest datos) {
         return actualizarStock(String.valueOf(id), datos);
@@ -146,6 +138,7 @@ public class ProductoService {
     }
 
     private Producto buscar(String identificador) {
+        // La interfaz puede enviar el id numérico o el código del servicio.
         if (identificador.matches("\\d+")) {
             return productoRepository.findById(Long.parseLong(identificador))
                     .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
@@ -162,7 +155,7 @@ public class ProductoService {
                 .orElseThrow(() -> new RecursoNoEncontradoException("Categoría no encontrada: " + nombreTipo));
     }
 
-    /** Proyecta la entidad a la forma que consume el frontend (`tipo` = categoría). */
+    /** Convierte el servicio a los datos que la API entrega al frontend. */
     public static ProductoResponse respuesta(Producto producto) {
         return new ProductoResponse(
                 producto.getId(),

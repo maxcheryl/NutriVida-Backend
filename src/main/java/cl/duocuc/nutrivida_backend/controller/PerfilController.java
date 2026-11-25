@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Perfil del usuario autenticado: datos personales y cambio de contraseña. */
+/** Permite a la persona autenticada consultar y actualizar su perfil. */
 @RestController
 @RequestMapping("/api/v1/perfil")
 @RequiredArgsConstructor

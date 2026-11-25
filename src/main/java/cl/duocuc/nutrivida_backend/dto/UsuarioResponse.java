@@ -3,7 +3,7 @@ package cl.duocuc.nutrivida_backend.dto;
 import cl.duocuc.nutrivida_backend.model.Usuario;
 import java.time.LocalDate;
 
-/** Datos públicos de un usuario: nunca incluye la contraseña. */
+/** Datos de la cuenta que pueden mostrarse en la aplicación. */
 public record UsuarioResponse(
         Long id,
         String nombre,
@@ -16,7 +16,7 @@ public record UsuarioResponse(
         String rol,
         boolean activo) {
 
-    /** Proyecta la entidad a la forma pública que consume el frontend. */
+    /** Copia a la respuesta los datos que se pueden compartir. */
     public static UsuarioResponse desde(Usuario usuario) {
         return new UsuarioResponse(
                 usuario.getId(),

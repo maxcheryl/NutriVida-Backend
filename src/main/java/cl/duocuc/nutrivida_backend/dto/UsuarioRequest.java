@@ -7,11 +7,7 @@ import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
-/**
- * Creación/edición de usuarios desde el panel administrativo o la
- * recepción. `contrasena` es obligatoria al crear; opcional al editar
- * (si se envía, debe acompañarse de la contraseña actual en el perfil).
- */
+/** Datos que envía el panel para crear o editar una cuenta. */
 public record UsuarioRequest(
         @NotBlank(message = "El nombre es obligatorio.")
         @Size(max = 50)
@@ -41,6 +37,6 @@ public record UsuarioRequest(
         @Size(max = 150)
         String direccion,
 
-        /** Solo el administrador puede asignar roles distintos de cliente. */
+        /** El rol que tendrá la cuenta. */
         String rol) {
 }

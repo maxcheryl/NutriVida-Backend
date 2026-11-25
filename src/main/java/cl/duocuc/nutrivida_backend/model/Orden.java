@@ -21,10 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Orden (compra/reserva) de un cliente: conserva fecha, total, estado
- * y el detalle con precios históricos al momento de la operación.
- */
+/** Guarda una reserva, quién la hizo, su estado y el total a pagar. */
 @Entity
 @Table(name = "ordenes")
 @Getter

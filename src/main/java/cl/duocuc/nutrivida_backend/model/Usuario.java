@@ -14,10 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Usuario del sistema: datos personales, credenciales cifradas (BCrypt),
- * rol asignado y estado de la cuenta (activo + intentos de login).
- */
+/** Guarda los datos de una persona, su rol y el estado de su cuenta. */
 @Entity
 @Table(name = "usuarios")
 @Getter
@@ -42,7 +39,7 @@ public class Usuario {
     @Column(name = "fecha_nacimiento", nullable = false)
     private LocalDate fechaNacimiento;
 
-    /** Contraseña cifrada con BCrypt; jamás se expone en las respuestas. */
+    /** Contraseña protegida; nunca se incluye en la respuesta de la API. */
     @Column(nullable = false, length = 100)
     private String contrasena;
 
@@ -59,11 +56,11 @@ public class Usuario {
     @JoinColumn(name = "rol_id", nullable = false)
     private Rol rol;
 
-    /** Cuenta activa: la "eliminación" administrativa es una desactivación lógica. */
+    /** Indica si la persona puede iniciar sesión. */
     @Column(nullable = false)
     private boolean activo = true;
 
-    /** Intentos fallidos consecutivos de login; a 3 queda bloqueado. */
+    /** Cuenta los intentos fallidos consecutivos de inicio de sesión. */
     @Column(name = "intentos_fallidos", nullable = false)
     private int intentosFallidos = 0;
 }

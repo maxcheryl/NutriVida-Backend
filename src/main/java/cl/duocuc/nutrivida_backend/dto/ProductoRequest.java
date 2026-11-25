@@ -7,10 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
-/**
- * Creación/edición de producto. `tipo` es el nombre de la categoría
- * (coincide con la forma en que el frontend original lo envía).
- */
+/** Datos que envía el panel para crear o actualizar un servicio. */
 public record ProductoRequest(
         @NotBlank(message = "El código es obligatorio.")
         @Size(max = 10, message = "El código no puede superar 10 caracteres.")

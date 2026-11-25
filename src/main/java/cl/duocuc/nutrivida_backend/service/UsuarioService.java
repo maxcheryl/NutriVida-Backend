@@ -17,11 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Gestión administrativa de usuarios (alta, edición, baja lógica y cambio
- * de rol) y edición del perfil propio. La eliminación es lógica para no
- * perder el historial de órdenes.
- */
+/** Administra las cuentas y permite que cada persona actualice su perfil. */
 @Service
 @RequiredArgsConstructor
 public class UsuarioService {
@@ -48,7 +44,7 @@ public class UsuarioService {
         return UsuarioResponse.desde(buscar(id));
     }
 
-    /** Alta de usuario (cliente, recepcionista o administrador). */
+    /** Crea una cuenta nueva con los datos validados y la contraseña protegida. */
     @Transactional
     public UsuarioResponse crear(UsuarioRequest datos) {
         String correo = datos.correo().trim().toLowerCase();
@@ -77,7 +73,7 @@ public class UsuarioService {
         return UsuarioResponse.desde(usuarioRepository.save(usuario));
     }
 
-    /** Edición completa desde el panel (la contraseña solo si se envía). */
+    /** Actualiza una cuenta; la contraseña y el rol cambian solo si se envían. */
     @Transactional
     public UsuarioResponse editar(Long id, UsuarioRequest datos) {
         Usuario usuario = buscar(id);
@@ -104,12 +100,12 @@ public class UsuarioService {
         if (datos.rol() != null && !datos.rol().isBlank()) {
             usuario.setRol(obtenerRol(datos.rol()));
         }
-        // Reabrir la cuenta al editarla (los intentos previos ya no aplican)
+        // Al guardar los cambios, se restablece el contador de intentos fallidos.
         usuario.setIntentosFallidos(0);
         return UsuarioResponse.desde(usuarioRepository.save(usuario));
     }
 
-    /** Baja lógica: conserva usuarios y órdenes, solo cambia el estado. */
+    /** Desactiva la cuenta sin borrar sus datos ni su historial. */
     @Transactional
     public UsuarioResponse desactivar(Long id) {
         Usuario usuario = buscar(id);
@@ -117,7 +113,7 @@ public class UsuarioService {
         return UsuarioResponse.desde(usuarioRepository.save(usuario));
     }
 
-    /** Reactivación de una cuenta desactivada. */
+    /** Reactiva la cuenta y reinicia sus intentos fallidos. */
     @Transactional
     public UsuarioResponse activar(Long id) {
         Usuario usuario = buscar(id);
@@ -126,7 +122,7 @@ public class UsuarioService {
         return UsuarioResponse.desde(usuarioRepository.save(usuario));
     }
 
-    /** Perfil del usuario autenticado: datos personales + cambio de contraseña opcional. */
+    /** Actualiza el perfil y cambia la contraseña solo si se solicitan ambos campos. */
     @Transactional
     public UsuarioResponse actualizarPerfil(Usuario autenticado, PerfilRequest datos) {
         Usuario usuario = buscar(autenticado.getId());
@@ -149,6 +145,7 @@ public class UsuarioService {
         boolean quiereCambiarContrasena = (datos.contrasenaActual() != null && !datos.contrasenaActual().isBlank())
                 || (datos.contrasenaNueva() != null && !datos.contrasenaNueva().isBlank());
         if (quiereCambiarContrasena) {
+            // Para cambiarla, la persona debe enviar y validar ambas contraseñas.
             if (datos.contrasenaActual() == null || datos.contrasenaActual().isBlank()
                     || datos.contrasenaNueva() == null || datos.contrasenaNueva().isBlank()) {
                 throw new OperacionNoPermitidaException(

@@ -15,11 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Servicio/plan del catálogo. `cuposIniciales` representa los cupos
- * disponibles (libres): se descuenta al crear una orden RESERVADA y se
- * devuelve si la orden se cancela.
- */
+/** Guarda los datos de un servicio y sus cupos disponibles para reservar. */
 @Entity
 @Table(name = "productos")
 @Getter
@@ -32,7 +28,7 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Código único del catálogo (CN001, PL001…): clave pública del producto. */
+    /** Código que identifica el servicio, por ejemplo CN001. */
     @Column(nullable = false, length = 10, unique = true)
     private String codigo;
 
@@ -58,11 +54,11 @@ public class Producto {
     @Column(length = 1000)
     private String descripcion;
 
-    /** URL externa de la imagen (Fase 11 / V1 esquema). */
+    /** Dirección web de la imagen que se muestra en el catálogo. */
     @Column(name = "imagen_url", length = 500)
     private String imagenUrl;
 
-    /** Producto visible en el catálogo: la eliminación es lógica para preservar el historial. */
+    /** Permite ocultar el servicio sin eliminar sus reservas anteriores. */
     @Column(nullable = false)
     private boolean activo = true;
 }

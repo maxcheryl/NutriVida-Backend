@@ -15,10 +15,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/**
- * Filtro JWT: lee la cookie httpOnly de acceso, valida el token y,
- * si es válido, establece la autenticación en el SecurityContext.
- */
+/** Lee el token de acceso de la cookie y reconoce al usuario de cada solicitud. */
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -37,6 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 long id = Long.parseLong(jwtService.decodificar(token).getSubject());
                 Usuario usuario = usuarioRepository.findById(id).orElse(null);
                 if (usuario != null && usuario.isActivo()) {
+                    // El rol se usa después para decidir qué rutas puede usar esta cuenta.
                     var autoridad = new SimpleGrantedAuthority(
                             "ROLE_" + usuario.getRol().getNombre().toUpperCase());
                     var autenticacion = new UsernamePasswordAuthenticationToken(
@@ -45,8 +43,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(autenticacion);
                 }
             } catch (Exception e) {
-                // Token inválido o expirado: continúa sin autenticación;
-                // el AuthenticationEntryPoint responderá 401 si el recurso lo exige.
+                // Si el token no sirve, la solicitud sigue como visitante.
+                // Las rutas protegidas responderán que falta iniciar sesión.
             }
         }
         cadena.doFilter(solicitud, respuesta);

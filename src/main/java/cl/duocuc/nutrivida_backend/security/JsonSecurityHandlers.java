@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
-/** Devuelve 401/403 en JSON (mismo formato que el resto de la API). */
+/** Responde en JSON cuando falta iniciar sesión o no hay permisos. */
 public final class JsonSecurityHandlers {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -17,14 +17,14 @@ public final class JsonSecurityHandlers {
     private JsonSecurityHandlers() {
     }
 
-    /** 401: no hay sesión o el token no es válido. */
+    /** Informa que hace falta una sesión válida. */
     public static AuthenticationEntryPoint puntoEntrada() {
         return (solicitud, respuesta, excepcion) ->
                 escribir(respuesta, HttpServletResponse.SC_UNAUTHORIZED,
                         "Debes iniciar sesión para acceder a este recurso.");
     }
 
-    /** 403: la sesión existe pero el rol no permite la operación. */
+    /** Informa que la cuenta no puede realizar esta operación. */
     public static AccessDeniedHandler accesoDenegado() {
         return (solicitud, respuesta, excepcion) ->
                 escribir(respuesta, HttpServletResponse.SC_FORBIDDEN,
@@ -35,6 +35,7 @@ public final class JsonSecurityHandlers {
         respuesta.setStatus(estado);
         respuesta.setContentType(MediaType.APPLICATION_JSON_VALUE);
         respuesta.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        // Usa el mismo formato de error que las demás respuestas de la API.
         respuesta.getWriter().write(MAPPER.writeValueAsString(new ErrorResponse(mensaje)));
     }
 }

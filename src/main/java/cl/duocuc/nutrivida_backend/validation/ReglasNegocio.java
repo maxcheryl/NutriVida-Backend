@@ -4,10 +4,7 @@ import cl.duocuc.nutrivida_backend.exception.OperacionNoPermitidaException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-/**
- * Reglas de negocio reutilizables. Reproduce las validaciones del proyecto
- * original: dominio @duocuc.cl, política de contraseña, edad y precios.
- */
+/** Reúne las reglas que deben cumplir usuarios, servicios y reservas. */
 public final class ReglasNegocio {
 
     public static final String DOMINIO_CORREO = "@duocuc.cl";
@@ -40,7 +37,7 @@ public final class ReglasNegocio {
         }
     }
 
-    /** Edad del usuario: entre 14 y 120 años (`contexto` = "El registro" o "El perfil"). */
+    /** Comprueba que la persona tenga entre 14 y 120 años. */
     public static void validarEdad(LocalDate fechaNacimiento, String contexto) {
         if (fechaNacimiento == null || fechaNacimiento.isAfter(LocalDate.now())) {
             throw new OperacionNoPermitidaException("La fecha de nacimiento no puede ser posterior al día de hoy");
@@ -54,7 +51,7 @@ public final class ReglasNegocio {
         }
     }
 
-    /** Precio de producto: entero entre 1.000 y 10.000.000. */
+    /** Comprueba que el precio sea un número entero dentro de los límites permitidos. */
     public static void validarPrecio(java.math.BigDecimal precio) {
         if (precio == null
                 || precio.compareTo(java.math.BigDecimal.valueOf(PRECIO_MINIMO)) < 0
